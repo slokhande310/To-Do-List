@@ -1,8 +1,19 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-mongoose.connect(process.env.MONGO_URI).then(() => {
-    console.log('Connection Successful');
-}).catch((e) => {
-    console.log(e);
-});
+const mongoDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);                                                   // connect to Atlas URI
+        console.log('connection successful');
+
+        const myTasks = await mongoose.connection.db.collection("tasks");
+        const myTasksArray = await myTasks.find({}).toArray();
+
+        global.myTasks = myTasksArray;
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports = mongoDB;

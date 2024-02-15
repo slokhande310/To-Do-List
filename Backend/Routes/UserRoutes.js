@@ -9,69 +9,83 @@ router.get('/', (req, res) => {
     res.send('Hey from Users Route')
 });
 
-
 // Register a New User
-
 router.post('/register', async (req, res) => {
     try {
         const { email, username, password } = req.body;
+        const response = { message: '', error: '' };
+
+        // check if user already exists or not
+        const userExists = await User.findOne({ $or: [{ username }, { email }] });
+        if (userExists) {
+            response.error = 'User already exists!';
+            return res.status(409).json(response);
+        }
 
         // check if email is valid or not using validator npm package
         if (!validator.validate(email)) {
-            return res.status(400).send({ message: 'Please Enter Valid Email!' });
-        }
-
-        // check if user already exists or not
-        const userExists = await User.findOne({ username });
-        if (userExists) {
-            return res.status(409).send({ message: 'User already exists!' });
+            response.error = 'Please enter a valid email!';
+            return res.status(400).json(response);
         }
 
         // Password validation using regular expression
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
 
         if (!passwordRegex.test(password)) {
-            return res.status(400).send({ message: 'Invalid password. It must be at least 6 characters long and contain at least one uppercase and one lowercase character.' });
+            response.error = 'Password must be 6 characters or more and contain at least one uppercase and one lowercase character.';
+            return res.status(400).json(response);
         }
 
-        // using brcypt, hash the password 
+        // using bcrypt, hash the password 
         const hashedPassword = await bcrypt.hash(password, 12);
 
         // save new user if all above checks are true
         const user = new User({ username, email, password: hashedPassword });
         await user.save();
 
-        return res.status(201).send({ message: 'User created successfully' })
+        response.message = 'User created successfully';
+        return res.status(201).json(response);
     } catch (error) {
-        res.status(500).send({ error: 'Internal Server Error' });
+        console.error('Internal Server Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 // Login User
 router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
+        const response = { user: null, message: '', error: '' };
 
         // check if user exists or not using username
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(400).send({ message: 'Invalid login credentials' });
+            response.error = 'Invalid login credentials';
+            return res.status(400).json(response);
         }
 
         // compare password using bcrypt compare method
         if (await bcrypt.compare(password, user.password)) {
             const token = jwt.sign({
                 _id: user._id.toString()
-            }, process.env.JWT_SECRETKEY)
+            }, process.env.JWT_SECRET_KEY);
 
-            return res.status(200).send({ user, message: 'User logged in successfully!', token });
+            response.user = user;
+            response.message = 'User logged in successfully!';
+            response.token = token;
+
+            return res.status(200).json(response);
         } else {
             // If passwords don't match, return an authentication failed message
-            return res.status(401).send({ message: 'Invalid Login Credentials' });
+            response.error = 'Invalid Login Credentials';
+            return res.status(401).json(response);
         }
     } catch (error) {
-        res.status(500).send({ error: 'Internal Server Error' });
+        console.error('Internal Server Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 module.exports = router;

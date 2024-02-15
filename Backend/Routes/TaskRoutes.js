@@ -35,18 +35,22 @@ router.post('/createtask', auth, async (req, res) => {
 router.get('/fetchtask', auth, async (req, res) => {
     try {
         // find tasks where owner id == provided id
-        const tasks = await Task.find({ owner: req.user._id });
+        const tasks = await Task.find({ owner: req.user._id }).sort({
+            completed: 1, // Ascending order for completed tasks (false first)
+            createdAt: -1, // Descending order for creation time
+        });
 
         // If no tasks available
         if (tasks.length === 0) {
-            return res.status(404).json({ error: 'No tasks available' });
+            return res.status(404).json({ message: 'No tasks available' });
         }
-        // if tasks available, display them
+        // If tasks available, display them
         res.status(200).json({ tasks });
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 // Fetch TASKS by ID
 router.get('/fetchtask/:id', auth, async (req, res) => {

@@ -4,12 +4,15 @@ const app = express();
 require('dotenv').config();
 const userRoutes = require('./Routes/UserRoutes');
 const taskRoutes = require('./Routes/TaskRoutes');
+const cors = require("cors");
 
 const hostname = '127.0.0.1';
 const port = process.env.PORT || 8000;
 
-require('./database/connection');
+const mongoDB = require('./database/connection');
+mongoDB();
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/users', userRoutes);
 app.use('/tasks', taskRoutes);
