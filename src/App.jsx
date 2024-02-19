@@ -11,6 +11,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
 
+  // when delete all is called in sidebar
+  const [dataUpdated, setDataUpdated] = useState(false);
+
+  const triggerDataFetch = () => {
+    setDataUpdated(prevState => !prevState);
+  };
+
+  // when filter changes
   const [filterOptions, setFilterOptions] = useState({
     all: false,
     active: false,
@@ -21,6 +29,7 @@ function App() {
     setFilterOptions(options);
   };
 
+  //when login status change
   const [loggedIn, setLoggedIn] = useState(false);
 
   const checkLogin = () => {
@@ -58,10 +67,10 @@ function App() {
         ) : (
           <>
             {/* Sidebar Component */}
-            <Sidebar logout={logout} onFilterChange={handleFilterChange} />
+            <Sidebar logout={logout} onFilterChange={handleFilterChange} onTriggerDataFetch={triggerDataFetch} />
             <Routes>
               {/* MyTasks Component */}
-              <Route exact path='/' element={<MyTasks filterOptions={filterOptions} />} />
+              <Route exact path='/' element={<MyTasks filterOptions={filterOptions} dataUpdated={dataUpdated} />} />
               {/* AddTask Component */}
               <Route path='/addtask' element={<AddTask />} />
               {/* TaskDetails Component */}

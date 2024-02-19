@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { handleDeleteTask } from '../Functions/DeleteTask';
 
-const MyTasks = ({ filterOptions }) => {
+const MyTasks = ({ filterOptions, dataUpdated }) => {
 
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +20,12 @@ const MyTasks = ({ filterOptions }) => {
           'Authorization': `Bearer ${authToken}`, // Add Bearer token to Authorization header
         },
       });
+
+      if (response.status === 404) {
+        // Handle the case where there are no tasks
+        setMyTasks([]); // or handle it according to your use case
+        return;
+      }
 
       if (!response.ok) {
         // Handle non-successful response (e.g., show an error message)
@@ -89,7 +95,7 @@ const MyTasks = ({ filterOptions }) => {
 
   useEffect(() => {
     loadData();
-  }, [])
+  }, [dataUpdated])
 
   return (
     <div className='h-dvh flex flex-col w-full p-4 overflow-y-auto'>

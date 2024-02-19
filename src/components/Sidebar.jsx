@@ -1,29 +1,59 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const Sidebar = ({ onFilterChange, logout }) => {
+const Sidebar = ({ onFilterChange, logout, onTriggerDataFetch }) => {
 
     const [filterOptions, setFilterOptions] = useState({
         all: false,
         active: false,
         completed: false,
     });
+
     const navigate = useNavigate();
     const [toggleFilterTaskDropDown, settoggleFilterTaskDropDown] = useState(false);
 
-    const handleClearCompleted = (e) => {
-        e.preventDefault();
-        console.log("Clear Completed clicked!");
-        // Implement logic to clear completed tasks
+    const handleClearCompleted = async () => {
+        const authToken = localStorage.getItem("authToken");
+
+        const userConfirmation = window.confirm('Delete Completed Tasks?')
+        if (!userConfirmation) {
+            return;
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/tasks/deletecompleted', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+            });
+
+            if (!response.ok) {
+                // Handle non-successful response (e.g., show an error message)
+                console.error(`Error: ${response.status} - ${response.statusText}`);
+                return;
+            }
+
+            const responseData = await response.json();
+            console.log(responseData);
+            onTriggerDataFetch();
+            navigate('/');
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const getUsername = localStorage.getItem("username");
+
+    const capitalizeFirstChar = (getUsername) => {
+        return getUsername.charAt(0).toUpperCase() + getUsername.slice(1);
+    };
 
     const handleFilterTask = (e) => {
         // Add your logic for clearing completed tasks here
         e.preventDefault();
         settoggleFilterTaskDropDown(!toggleFilterTaskDropDown);
-        console.log("Filter Task clicked!");
     };
 
     const handleFilterChange = (option) => {
@@ -102,7 +132,8 @@ const Sidebar = ({ onFilterChange, logout }) => {
 
                     {/* Clear Completed */}
                     <li>
-                        <Link to="/clearcompleted" className={`flex rounded-xl p-3 border border-slate-300 items-center gap-x-2 text-gray-700 hover:bg-slate-300 transition-all ease duration-75`} onClick={handleClearCompleted}>
+                        <Link className={`flex rounded-xl p-3 border border-slate-300 items-center gap-x-2 text-gray-700 hover:bg-slate-300 transition-all ease duration-75`}
+                            onClick={handleClearCompleted}>
                             <i className="fa-solid fa-trash text-red-500"></i>
                             <span>Clear Completed</span>
                         </Link>
@@ -110,7 +141,7 @@ const Sidebar = ({ onFilterChange, logout }) => {
                 </ul>
             </div>
             <div className="flex justify-between items-center w-full p-4 border-t border-black text-gray-500">
-                <span className="text-sm">{getUsername}</span>
+                <span className="text-sm">{capitalizeFirstChar(getUsername)}</span>
                 <Link onClick={handleLogout} className="text-base flex items-center gap-x-1 hover:text-black transition-all ease-linear duration-150">
                     <span className="flex items-center gap-x-1">Logout<i className="fa-solid fa-right-from-bracket"></i></span>
                 </Link>

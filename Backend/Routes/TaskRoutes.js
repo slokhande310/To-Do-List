@@ -126,4 +126,36 @@ router.delete('/deletetask/:id', auth, async (req, res) => {
     }
 });
 
+// delete completed tasks
+router.delete('/deletecompleted', auth, async (req, res) => {
+    try {
+        const tasksToDelete = await Task.find({
+            completed: true,
+            owner: req.user._id
+        });
+
+        if (!tasksToDelete || tasksToDelete.length === 0) {
+            return res.status(404).json({ error: 'No completed tasks found' });
+        }
+
+        // Use deleteMany to delete all matching tasks
+        const deleteResult = await Task.deleteMany({
+            completed: true,
+            owner: req.user._id
+        });
+
+        if (deleteResult.deletedCount === 0) {
+            return res.status(404).json({ error: 'No tasks deleted' });
+        }
+
+        res.status(200).json({
+            message: 'Completed tasks have been deleted',
+            deletedCount: deleteResult.deletedCount
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 module.exports = router;

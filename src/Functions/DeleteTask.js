@@ -24,7 +24,7 @@ export const handleDeleteTask = async (taskId, navigate) => {
         }
 
         // Redirect to the homepage after successful deletion
-        navigate('/mytask');
+        navigate('/');
     } catch (error) {
         console.log('Error Deleting task:', error);
     }
