@@ -23,25 +23,21 @@ Before running the application, ensure you have the following installed:
 
 ### Installation
 
-1. Clone the repository
+1. Fork the repository
 
 2. Clone the repository:
-
    ```bash
    https://github.com/slokhande310/To-Do-List
    ```
 3. Navigate to the project directory:
-
    ```bash
    cd To-Do-List
    ```
 4. Install dependencies:
-
    ```bash
    npm install
    ```
 5. Install dependencies for backend
-
     ```bash
     cd Backend
    npm install
@@ -53,7 +49,6 @@ Before running the application, ensure you have the following installed:
    JWT_SECRET=your_jwt_secret
    ```
 7. Run the Backend application:
-
    ```bash
    nodemon ./index.js
    ```
