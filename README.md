@@ -8,9 +8,6 @@ Introducing my Todo List web app crafted with the power of MERN stack. Dive into
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-- [Usage](#usage)
-  - [Authentication](#authentication)
-  - [Endpoints](#endpoints)
 
 ## Getting Started
 
