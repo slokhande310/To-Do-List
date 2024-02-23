@@ -34,23 +34,34 @@ router.post('/createtask', auth, async (req, res) => {
 // Fetch TASKS
 router.get('/fetchtask', auth, async (req, res) => {
     try {
-        // find tasks where owner id == provided id
-        const tasks = await Task.find({ owner: req.user._id }).sort({
-            completed: 1, // Ascending order for completed tasks (false first)
-            createdAt: -1, // Descending order for creation time
-        });
+        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+        const pageSize = parseInt(req.query.pageSize) || 10; // Default to 10 tasks per page
+
+        // Calculate the skip value based on the page and pageSize
+        const skip = (page - 1) * pageSize;
+
+        const totalTasks = await Task.countDocuments({ owner: req.user._id });
+
+        // Find tasks where owner id == provided id, with pagination
+        const tasks = await Task.find({ owner: req.user._id })
+            .sort({
+                completed: 1, // Ascending order for completed tasks (false first)
+                createdAt: -1, // Descending order for creation time
+            })
+            .skip(skip)
+            .limit(pageSize);
 
         // If no tasks available
         if (tasks.length === 0) {
             return res.status(404).json({ message: 'No tasks available' });
         }
+
         // If tasks available, display them
-        res.status(200).json({ tasks });
+        res.status(200).json({ tasks, totalTasks });
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 
 // Fetch TASKS by ID
 router.get('/fetchtask/:id', auth, async (req, res) => {
