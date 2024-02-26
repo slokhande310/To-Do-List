@@ -177,6 +177,7 @@ const MyTasks = ({ filterOptions, dataUpdated }) => {
                   previousLinkClassName={'relative inline-flex items-center rounded-l-md px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-300 hover:text-black focus:z-20 focus:outline-offset-0'}
                   nextLinkClassName={'relative inline-flex items-center rounded-r-md px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-300 hover:text-black focus:z-20 focus:outline-offset-0'}
                   breakLinkClassName={'relative inline-flex items-center px-4 py-2.5 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:text-black hover:bg-gray-300 focus:z-20 focus:outline-offset-0'}
+                  activeLinkClassName={'active'}
                   className={'w-full flex items-center justify-center bg-white gap-x-2'} />
               </div>
             )
