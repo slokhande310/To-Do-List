@@ -46,7 +46,7 @@ Before running the application, ensure you have the following installed:
    ```bash
    PORT=PORT_NUMBER
    MONGO_URI=your_mongodb_atlas_connection_string
-   JWT_SECRET=your_jwt_secret
+   JWT_SECRET_KEY=your_jwt_secret
    ```
 7. Run the Backend application:
    ```bash
