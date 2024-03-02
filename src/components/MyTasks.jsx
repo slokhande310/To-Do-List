@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { handleDeleteTask } from '../Functions/DeleteTask';
-import ReactPaginate from 'react-paginate';
 
 const MyTasks = ({ filterOptions, dataUpdated }) => {
 
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [myTasks, setMyTasks] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
-  const loadData = async (page = 1, pageSize = 8) => {
+  const loadData = async () => {
     try {
       // Get the JWT token from your authentication mechanism
       const authToken = localStorage.getItem('authToken');
-      let response = await fetch(`http://127.0.0.1:8000/tasks/fetchtask?page=${page}&pageSize=${pageSize}`, {
+      let response = await fetch(`http://127.0.0.1:8000/tasks/fetchtask`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -25,7 +22,7 @@ const MyTasks = ({ filterOptions, dataUpdated }) => {
 
       if (response.status === 404) {
         // Handle the case where there are no tasks
-        setMyTasks([]); // or handle it according to your use case
+        setMyTasks([]);
         return;
       }
 
@@ -37,8 +34,6 @@ const MyTasks = ({ filterOptions, dataUpdated }) => {
 
       response = await response.json();
       setMyTasks(response.tasks);
-      setTotalPages(Math.ceil(response.totalTasks / pageSize));
-      console.log(response.totalTasks);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -96,12 +91,6 @@ const MyTasks = ({ filterOptions, dataUpdated }) => {
     loadData(); // Reload data after deletion
   };
 
-  const handlePageClick = (data) => {
-    const selectedPage = data.selected + 1;
-    setCurrentPage(selectedPage);
-    loadData(selectedPage);
-  }
-
   useEffect(() => {
     loadData();
   }, [dataUpdated])
@@ -130,7 +119,7 @@ const MyTasks = ({ filterOptions, dataUpdated }) => {
         </div>
 
         {/* Tasks Data */}
-        <div className='flex flex-col gap-y-2 w-3/5 min-h-[65%] p-4'>
+        <div className='flex flex-col gap-y-2 w-3/5 min-h-[65%] p-4 '>
           {
             filteredResult.length === 0 ? (
               <div className="text-xl">No tasks available</div>
@@ -160,28 +149,8 @@ const MyTasks = ({ filterOptions, dataUpdated }) => {
               ))
             )
           }
+          <div className='min-h-5 w-full bg-transparent '></div>
         </div>
-        {
-          filteredResult.length === 0 ? null
-            : (
-              <div className=' border-black w-3/5 flex items-center justify-center select-none'>
-                <ReactPaginate
-                  previousLabel="Prev"
-                  nextLabel="Next"
-                  breakLabel="..."
-                  onPageChange={handlePageClick}
-                  pageCount={totalPages}
-                  initialPage={0}
-                  pageRangeDisplayed={10}
-                  pageLinkClassName={`relative inline-flex items-center px-4 py-2.5 text-sm font-semibold text-gray-500 ring-1 ring-inset ring-gray-300 hover:bg-gray-300 hover:text-black focus:z-20 focus:outline-offset-0`}
-                  previousLinkClassName={'relative inline-flex items-center rounded-l-md px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-300 hover:text-black focus:z-20 focus:outline-offset-0'}
-                  nextLinkClassName={'relative inline-flex items-center rounded-r-md px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-300 hover:text-black focus:z-20 focus:outline-offset-0'}
-                  breakLinkClassName={'relative inline-flex items-center px-4 py-2.5 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:text-black hover:bg-gray-300 focus:z-20 focus:outline-offset-0'}
-                  activeLinkClassName={'active'}
-                  className={'w-full flex items-center justify-center bg-white gap-x-2'} />
-              </div>
-            )
-        }
       </div>
     </div>
   );
